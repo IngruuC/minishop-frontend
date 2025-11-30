@@ -1,11 +1,13 @@
 import { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
+import { Link } from 'react-router-dom'
 import { fetchPublicProducts } from '../store/slices/productSlice'
 import ProductCard from '../components/ProductCard'
 
 const Home = () => {
   const dispatch = useDispatch()
   const { items: products, loading, error } = useSelector((state) => state.products)
+  const { isAuthenticated } = useSelector((state) => state.auth)
 
   useEffect(() => {
     dispatch(fetchPublicProducts())
@@ -35,10 +37,26 @@ const Home = () => {
             Los mejores productos al mejor precio
           </p>
           <div className="flex gap-4 justify-center">
-            <button className="bg-white text-blue-600 px-8 py-4 rounded-full text-xl font-bold hover:bg-blue-50 transform hover:scale-105 transition shadow-2xl">
+            <button 
+              onClick={() => {
+                const productSection = document.getElementById('productos-section')
+                if (productSection) {
+                  productSection.scrollIntoView({ behavior: 'smooth' })
+                }
+              }}
+              className="bg-white text-blue-600 px-8 py-4 rounded-full text-xl font-bold hover:bg-blue-50 transform hover:scale-105 transition shadow-2xl"
+            >
               Ver Productos
             </button>
-            <button className="bg-blue-600 text-white px-8 py-4 rounded-full text-xl font-bold hover:bg-blue-700 transform hover:scale-105 transition shadow-2xl border-2 border-white">
+            <button 
+              onClick={() => {
+                const productSection = document.getElementById('productos-section')
+                if (productSection) {
+                  productSection.scrollIntoView({ behavior: 'smooth' })
+                }
+              }}
+              className="bg-blue-600 text-white px-8 py-4 rounded-full text-xl font-bold hover:bg-blue-700 transform hover:scale-105 transition shadow-2xl border-2 border-white"
+            >
               Ofertas Especiales
             </button>
           </div>
@@ -46,7 +64,7 @@ const Home = () => {
       </div>
 
       {/* Sección de productos */}
-      <div className="container mx-auto px-4 py-16">
+      <div id="productos-section" className="container mx-auto px-4 py-16">
         {/* Loading */}
         {loading && (
           <div className="text-center py-20 bg-white rounded-3xl shadow-xl">
@@ -96,61 +114,174 @@ const Home = () => {
                   ))}
                 </div>
 
-                {/* Call to Action */}
-                <div className="mt-16 bg-gradient-to-r from-blue-600 to-purple-600 rounded-3xl p-12 text-center shadow-2xl">
-                  <h3 className="text-4xl font-bold text-white mb-4">
-                    ¿Buscás algo en especial?
-                  </h3>
-                  <p className="text-xl text-white mb-8 opacity-90">
-                    Registrate y accedé a ofertas exclusivas
-                  </p>
-                  <button className="bg-white text-blue-600 px-10 py-4 rounded-full text-xl font-bold hover:bg-blue-50 transform hover:scale-105 transition shadow-xl">
-                    Registrarse Ahora
-                  </button>
-                </div>
+                {/* Call to Action - Solo si NO está autenticado */}
+                {!isAuthenticated && (
+                  <div className="mt-16 bg-gradient-to-r from-blue-600 to-purple-600 rounded-3xl p-12 text-center shadow-2xl">
+                    <h3 className="text-4xl font-bold text-white mb-4">
+                      ¿Buscás algo en especial?
+                    </h3>
+                    <p className="text-xl text-white mb-8 opacity-90">
+                      Registrate y accedé a ofertas exclusivas
+                    </p>
+                    <Link to="/register">
+                      <button className="bg-white text-blue-600 px-10 py-4 rounded-full text-xl font-bold hover:bg-blue-50 transform hover:scale-105 transition shadow-xl">
+                        Registrarse Ahora
+                      </button>
+                    </Link>
+                  </div>
+                )}
               </>
             )}
           </>
         )}
       </div>
 
-      {/* Features Section */}
-      <div className="bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 py-20 mt-20">
-        <div className="container mx-auto px-4">
-          <h2 className="text-4xl md:text-5xl font-bold text-center text-gray-800 mb-4">
+      {/* Features Section - IMPORTANTE: Esta sección debe estar FUERA del container de productos */}
+      <div style={{ 
+        background: 'linear-gradient(135deg, #EBF4FF 0%, #F3E7FF 50%, #FFE7F3 100%)',
+        padding: '80px 0',
+        marginTop: '80px'
+      }}>
+        <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 20px' }}>
+          <h2 style={{ 
+            fontSize: '48px', 
+            fontWeight: 'bold', 
+            textAlign: 'center', 
+            color: '#1F2937',
+            marginBottom: '16px'
+          }}>
             ¿Por qué elegir MiniShop?
           </h2>
-          <p className="text-center text-xl text-gray-600 mb-16">
+          <p style={{ 
+            textAlign: 'center', 
+            fontSize: '20px', 
+            color: '#6B7280',
+            marginBottom: '60px'
+          }}>
             La mejor experiencia de compra online
           </p>
           
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
-            <div className="bg-white text-center p-10 rounded-3xl shadow-xl hover:shadow-2xl transition transform hover:-translate-y-3 border border-gray-100">
-              <div className="bg-gradient-to-br from-blue-400 to-blue-600 w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg">
-                <span className="text-5xl">🚚</span>
+          <div style={{ 
+            display: 'grid', 
+            gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
+            gap: '40px'
+          }}>
+            {/* Card 1 - Envío Rápido */}
+            <div style={{ 
+              background: 'white',
+              textAlign: 'center',
+              padding: '40px',
+              borderRadius: '24px',
+              boxShadow: '0 10px 30px rgba(0,0,0,0.1)',
+              border: '1px solid #E5E7EB',
+              transition: 'all 0.3s ease'
+            }}>
+              <div style={{ 
+                background: 'linear-gradient(135deg, #60A5FA 0%, #2563EB 100%)',
+                width: '96px',
+                height: '96px',
+                borderRadius: '50%',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                margin: '0 auto 24px',
+                boxShadow: '0 8px 20px rgba(37, 99, 235, 0.3)'
+              }}>
+                <span style={{ fontSize: '48px' }}>🚚</span>
               </div>
-              <h3 className="text-2xl font-bold text-gray-800 mb-4">Envío Rápido</h3>
-              <p className="text-gray-600 text-lg leading-relaxed">
+              <h3 style={{ 
+                fontSize: '24px', 
+                fontWeight: 'bold', 
+                color: '#1F2937',
+                marginBottom: '16px'
+              }}>
+                Envío Rápido
+              </h3>
+              <p style={{ 
+                color: '#6B7280', 
+                fontSize: '18px',
+                lineHeight: '1.6'
+              }}>
                 Recibí tus productos en tiempo récord. Envíos a todo el país en 24-48hs
               </p>
             </div>
             
-            <div className="bg-white text-center p-10 rounded-3xl shadow-xl hover:shadow-2xl transition transform hover:-translate-y-3 border border-gray-100">
-              <div className="bg-gradient-to-br from-green-400 to-green-600 w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg">
-                <span className="text-5xl">💳</span>
+            {/* Card 2 - Pago Seguro */}
+            <div style={{ 
+              background: 'white',
+              textAlign: 'center',
+              padding: '40px',
+              borderRadius: '24px',
+              boxShadow: '0 10px 30px rgba(0,0,0,0.1)',
+              border: '1px solid #E5E7EB',
+              transition: 'all 0.3s ease'
+            }}>
+              <div style={{ 
+                background: 'linear-gradient(135deg, #34D399 0%, #059669 100%)',
+                width: '96px',
+                height: '96px',
+                borderRadius: '50%',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                margin: '0 auto 24px',
+                boxShadow: '0 8px 20px rgba(5, 150, 105, 0.3)'
+              }}>
+                <span style={{ fontSize: '48px' }}>💳</span>
               </div>
-              <h3 className="text-2xl font-bold text-gray-800 mb-4">Pago Seguro</h3>
-              <p className="text-gray-600 text-lg leading-relaxed">
+              <h3 style={{ 
+                fontSize: '24px', 
+                fontWeight: 'bold', 
+                color: '#1F2937',
+                marginBottom: '16px'
+              }}>
+                Pago Seguro
+              </h3>
+              <p style={{ 
+                color: '#6B7280', 
+                fontSize: '18px',
+                lineHeight: '1.6'
+              }}>
                 Múltiples métodos de pago disponibles. Compra segura y protegida
               </p>
             </div>
             
-            <div className="bg-white text-center p-10 rounded-3xl shadow-xl hover:shadow-2xl transition transform hover:-translate-y-3 border border-gray-100">
-              <div className="bg-gradient-to-br from-yellow-400 to-yellow-600 w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg">
-                <span className="text-5xl">⭐</span>
+            {/* Card 3 - Calidad Garantizada */}
+            <div style={{ 
+              background: 'white',
+              textAlign: 'center',
+              padding: '40px',
+              borderRadius: '24px',
+              boxShadow: '0 10px 30px rgba(0,0,0,0.1)',
+              border: '1px solid #E5E7EB',
+              transition: 'all 0.3s ease'
+            }}>
+              <div style={{ 
+                background: 'linear-gradient(135deg, #FBBF24 0%, #D97706 100%)',
+                width: '96px',
+                height: '96px',
+                borderRadius: '50%',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                margin: '0 auto 24px',
+                boxShadow: '0 8px 20px rgba(217, 119, 6, 0.3)'
+              }}>
+                <span style={{ fontSize: '48px' }}>⭐</span>
               </div>
-              <h3 className="text-2xl font-bold text-gray-800 mb-4">Calidad Garantizada</h3>
-              <p className="text-gray-600 text-lg leading-relaxed">
+              <h3 style={{ 
+                fontSize: '24px', 
+                fontWeight: 'bold', 
+                color: '#1F2937',
+                marginBottom: '16px'
+              }}>
+                Calidad Garantizada
+              </h3>
+              <p style={{ 
+                color: '#6B7280', 
+                fontSize: '18px',
+                lineHeight: '1.6'
+              }}>
                 Los mejores productos del mercado. Garantía de satisfacción total
               </p>
             </div>
