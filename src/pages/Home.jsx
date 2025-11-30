@@ -49,18 +49,18 @@ const Home = () => {
       <div className="container mx-auto px-4 py-16">
         {/* Loading */}
         {loading && (
-          <div className="text-center py-20">
-            <div className="inline-block animate-spin rounded-full h-16 w-16 border-b-4 border-blue-600"></div>
-            <p className="mt-6 text-xl text-gray-600 font-semibold">Cargando productos increíbles...</p>
+          <div className="text-center py-20 bg-white rounded-3xl shadow-xl">
+            <div className="inline-block animate-spin rounded-full h-16 w-16 border-b-4 border-blue-600 mb-6"></div>
+            <p className="text-2xl text-gray-600 font-semibold">Cargando productos increíbles...</p>
           </div>
         )}
 
         {/* Error */}
         {error && (
-          <div className="bg-red-50 border-l-4 border-red-500 text-red-700 px-6 py-4 rounded-lg mb-6 shadow-lg">
+          <div className="bg-gradient-to-r from-red-50 to-red-100 border-l-4 border-red-500 text-red-700 px-8 py-6 rounded-2xl mb-6 shadow-xl">
             <div className="flex items-center">
-              <span className="text-2xl mr-3">❌</span>
-              <p className="font-semibold">{error}</p>
+              <span className="text-3xl mr-4">❌</span>
+              <p className="text-lg font-semibold">{error}</p>
             </div>
           </div>
         )}
@@ -69,10 +69,13 @@ const Home = () => {
         {!loading && !error && (
           <>
             {products.length === 0 ? (
-              <div className="text-center py-20 bg-white rounded-3xl shadow-lg">
-                <div className="text-8xl mb-6">🛍️</div>
-                <p className="text-3xl text-gray-500 font-bold">No hay productos disponibles</p>
-                <p className="text-xl text-gray-400 mt-4">Vuelve pronto para ver nuestras ofertas</p>
+              <div className="text-center py-24 bg-gradient-to-br from-white to-gray-50 rounded-3xl shadow-2xl border border-gray-100">
+                <div className="text-9xl mb-8 animate-pulse">🛍️</div>
+                <p className="text-4xl text-gray-700 font-bold mb-4">No hay productos disponibles</p>
+                <p className="text-xl text-gray-500 mb-8">Vuelve pronto para ver nuestras ofertas especiales</p>
+                <button className="bg-blue-600 text-white px-8 py-4 rounded-full text-lg font-bold hover:bg-blue-700 transform hover:scale-105 transition shadow-lg">
+                  Notificarme cuando haya productos
+                </button>
               </div>
             ) : (
               <>
@@ -112,23 +115,44 @@ const Home = () => {
       </div>
 
       {/* Features Section */}
-      <div className="bg-white py-16 mt-16">
+      <div className="bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 py-20 mt-20">
         <div className="container mx-auto px-4">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="text-center p-8 rounded-2xl hover:shadow-xl transition transform hover:-translate-y-2">
-              <div className="text-6xl mb-4">🚚</div>
-              <h3 className="text-2xl font-bold text-gray-800 mb-3">Envío Rápido</h3>
-              <p className="text-gray-600">Recibí tus productos en tiempo récord</p>
+          <h2 className="text-4xl md:text-5xl font-bold text-center text-gray-800 mb-4">
+            ¿Por qué elegir MiniShop?
+          </h2>
+          <p className="text-center text-xl text-gray-600 mb-16">
+            La mejor experiencia de compra online
+          </p>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
+            <div className="bg-white text-center p-10 rounded-3xl shadow-xl hover:shadow-2xl transition transform hover:-translate-y-3 border border-gray-100">
+              <div className="bg-gradient-to-br from-blue-400 to-blue-600 w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg">
+                <span className="text-5xl">🚚</span>
+              </div>
+              <h3 className="text-2xl font-bold text-gray-800 mb-4">Envío Rápido</h3>
+              <p className="text-gray-600 text-lg leading-relaxed">
+                Recibí tus productos en tiempo récord. Envíos a todo el país en 24-48hs
+              </p>
             </div>
-            <div className="text-center p-8 rounded-2xl hover:shadow-xl transition transform hover:-translate-y-2">
-              <div className="text-6xl mb-4">💳</div>
-              <h3 className="text-2xl font-bold text-gray-800 mb-3">Pago Seguro</h3>
-              <p className="text-gray-600">Múltiples métodos de pago disponibles</p>
+            
+            <div className="bg-white text-center p-10 rounded-3xl shadow-xl hover:shadow-2xl transition transform hover:-translate-y-3 border border-gray-100">
+              <div className="bg-gradient-to-br from-green-400 to-green-600 w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg">
+                <span className="text-5xl">💳</span>
+              </div>
+              <h3 className="text-2xl font-bold text-gray-800 mb-4">Pago Seguro</h3>
+              <p className="text-gray-600 text-lg leading-relaxed">
+                Múltiples métodos de pago disponibles. Compra segura y protegida
+              </p>
             </div>
-            <div className="text-center p-8 rounded-2xl hover:shadow-xl transition transform hover:-translate-y-2">
-              <div className="text-6xl mb-4">⭐</div>
-              <h3 className="text-2xl font-bold text-gray-800 mb-3">Calidad Garantizada</h3>
-              <p className="text-gray-600">Los mejores productos del mercado</p>
+            
+            <div className="bg-white text-center p-10 rounded-3xl shadow-xl hover:shadow-2xl transition transform hover:-translate-y-3 border border-gray-100">
+              <div className="bg-gradient-to-br from-yellow-400 to-yellow-600 w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg">
+                <span className="text-5xl">⭐</span>
+              </div>
+              <h3 className="text-2xl font-bold text-gray-800 mb-4">Calidad Garantizada</h3>
+              <p className="text-gray-600 text-lg leading-relaxed">
+                Los mejores productos del mercado. Garantía de satisfacción total
+              </p>
             </div>
           </div>
         </div>
