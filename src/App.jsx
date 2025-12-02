@@ -11,7 +11,6 @@ import Profile from './pages/Profile'
 import PrivateRoute from './components/PrivateRoute'
 import ResetPassword from './pages/ResetPassword'
 import ForgotPassword from './pages/ForgotPassword'
-import OAuthCallback from './components/0authcallback'
 
 function App() {
   const dispatch = useDispatch()
@@ -32,7 +31,6 @@ function App() {
         <Route path="/category/:category" element={<Home />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
-        <Route path="/auth/callback" element={<OAuthCallback />} />
         <Route
           path="/dashboard"
           element={
