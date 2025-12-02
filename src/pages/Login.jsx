@@ -100,9 +100,9 @@ const Login = () => {
                 <input type="checkbox" className="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500" />
                 <span className="ml-2 text-sm text-gray-600">Recordarme</span>
               </label>
-              <a href="#" className="text-sm text-blue-600 hover:text-blue-700 font-semibold">
+              <Link to="/forgot-password" className="text-sm text-blue-600 hover:text-blue-700 font-semibold">
                 ¿Olvidaste tu contraseña?
-              </a>
+              </Link>
             </div>
 
             <button

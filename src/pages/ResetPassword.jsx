@@ -1,10 +1,12 @@
 import { useState } from 'react'
-import { useParams, useNavigate, Link } from 'react-router-dom'
+import { useParams, useNavigate, Link, useLocation } from 'react-router-dom'
 import { authAPI } from '../services/api'
 import { useToast } from '../contexts/ToastContext'
 
 const ResetPassword = () => {
-  const { token } = useParams()
+  const params = useParams()
+  const location = useLocation()
+  const token = params.token || new URLSearchParams(location.search).get('token')
   const navigate = useNavigate()
   const { showToast } = useToast()
   const [formData, setFormData] = useState({ password: '', confirmPassword: '' })
@@ -18,6 +20,10 @@ const ResetPassword = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
+    if (!token) {
+      setError('Token de reseteo inválido o ausente')
+      return
+    }
     
     if (formData.password !== formData.confirmPassword) {
       setError('Las contraseñas no coinciden')
