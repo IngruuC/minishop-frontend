@@ -1,21 +1,22 @@
 import { Link, useNavigate } from 'react-router-dom'
 import { useSelector, useDispatch } from 'react-redux'
 import { logout } from '../store/slices/authSlice'
+import { useToast } from '../contexts/ToastContext'
 
 const Navbar = () => {
   const { isAuthenticated, user } = useSelector((state) => state.auth)
   const dispatch = useDispatch()
   const navigate = useNavigate()
+  const { showToast } = useToast()
 
   const handleLogout = () => {
-    dispatch(logout())
-    // Mostrar confirmación al usuario y redirigir al inicio público
-    try {
-      alert('Ha cerrado sesión correctamente')
-    } catch (e) {
-      // en caso de entorno que no soporte alert, no hacer nada
-    }
+    // Primero navegar al inicio público para evitar que PrivateRoute redirija a /login
     navigate('/')
+    dispatch(logout())
+    try {
+      // Mostrar toast con estética del sitio
+      showToast && showToast('Ha cerrado sesión correctamente', 'success')
+    } catch (e) {}
   }
 
   return (
@@ -37,9 +38,9 @@ const Navbar = () => {
                   Dashboard
                 </Link>
                 <div className="flex items-center gap-4">
-                  <span className="text-sm">👤 {user?.nombre}</span>
-                  <Link to="/profile" className="hover:text-blue-200 transition">
-                    Ver mi perfil
+                  <Link to="/profile" className="text-sm hover:text-blue-200 transition flex items-center gap-2">
+                    <span>👤</span>
+                    <span>{user?.nombre}</span>
                   </Link>
                   <button
                     onClick={handleLogout}
