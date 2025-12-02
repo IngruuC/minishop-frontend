@@ -166,7 +166,6 @@ const Login = () => {
               Google
             </button>
           </div>
-          </div>
         </div>
       </div>
     </div>
