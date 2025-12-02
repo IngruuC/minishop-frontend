@@ -9,6 +9,7 @@ import Register from './pages/Register'
 import Dashboard from './pages/Dashboard'
 import Profile from './pages/Profile'
 import PrivateRoute from './components/PrivateRoute'
+import ResetPassword from './pages/ResetPassword'
 
 function App() {
   const dispatch = useDispatch()
@@ -26,7 +27,7 @@ function App() {
       <Navbar />
       <Routes>
         <Route path="/" element={<Home />} />
-  <Route path="/category/:category" element={<Home />} />
+        <Route path="/category/:category" element={<Home />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route
@@ -45,6 +46,7 @@ function App() {
             </PrivateRoute>
           }
         />
+        <Route path="/reset-password/:token" element={<ResetPassword />} />
       </Routes>
     </div>
   )
