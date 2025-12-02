@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-export const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api'
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api'
 
 // Crear instancia de axios
 const api = axios.create({
@@ -41,8 +41,7 @@ api.interceptors.response.use(
 export const authAPI = {
   register: (data) => api.post('/auth/register', data),
   login: (data) => api.post('/auth/login', data),
-  verify: () => api.get('/auth/verify'),
-  forgotPassword: (data) => api.post('/auth/forgot-password', data)
+  verify: () => api.get('/auth/verify')
 }
 
 // PRODUCTS
