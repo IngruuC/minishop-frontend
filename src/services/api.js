@@ -45,7 +45,6 @@ const normalizeProductUpdate = (data) => {
     normalized.nombre = String(data.nombre).trim()
   }
   if (data.descripcion !== undefined && data.descripcion !== null) {
-    // Joi exige mínimo 10 caracteres
     normalized.descripcion = String(data.descripcion).trim()
   }
   if (data.precio !== undefined && data.precio !== null && data.precio !== '') {
@@ -57,15 +56,24 @@ const normalizeProductUpdate = (data) => {
     if (!Number.isNaN(stockNum)) normalized.stock = stockNum
   }
   if (data.imagen !== undefined && data.imagen !== null) {
-    // Joi permite URI válida o '', evita null/undefined
     normalized.imagen = data.imagen === '' ? '' : String(data.imagen).trim()
   }
   if (data.categoria !== undefined && data.categoria !== null) {
-    // Joi permite '' y máximo 50 chars
     normalized.categoria = String(data.categoria).trim()
   }
   if (data.activo !== undefined && data.activo !== null) {
     normalized.activo = Boolean(data.activo)
+  }
+  
+  // Agregar promoción al payload normalizado
+  if (data.promocion !== undefined && data.promocion !== null) {
+    normalized.promocion = {
+      activa: Boolean(data.promocion.activa),
+      tipo: data.promocion.tipo || 'porcentaje',
+      valor: Number(data.promocion.valor) || 0,
+      fechaInicio: data.promocion.fechaInicio || null,
+      fechaFin: data.promocion.fechaFin || null
+    }
   }
 
   return normalized
@@ -84,6 +92,7 @@ export const authAPI = {
 export const productsAPI = {
   // Público
   getPublic: () => api.get('/products/public'),
+  getPromotions: () => api.get('/products/public/promotions'),
   getCategories: () => api.get('/products/public/categories'),
   getByCategory: (category) => api.get(`/products/public/category/${encodeURIComponent(category)}`),
 
@@ -99,8 +108,9 @@ export const productsAPI = {
   delete: (id) => api.delete(`/products/${id}`),
   deletePermanent: (id) => api.delete(`/products/${id}/permanent`),
 
-  // Toggle estado
-  toggleStatus: (id) => api.patch(`/products/${id}/toggle-status`)
+  // Toggle estado y promoción
+  toggleStatus: (id) => api.patch(`/products/${id}/toggle-status`),
+  togglePromotion: (id) => api.patch(`/products/${id}/toggle-promotion`)
 }
 
 export default api

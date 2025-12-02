@@ -1,7 +1,7 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { Link, useParams } from 'react-router-dom'
-import { fetchPublicProducts, fetchProductsByCategory } from '../store/slices/productSlice'
+import { fetchPublicProducts, fetchProductsByCategory, fetchPromotionProducts } from '../store/slices/productSlice'
 import ProductCard from '../components/ProductCard'
 import CategorySidebar from '../components/CategorySidebar'
 
@@ -9,17 +9,27 @@ const Home = () => {
   const dispatch = useDispatch()
   const { items: products, loading, error } = useSelector((state) => state.products)
   const { isAuthenticated } = useSelector((state) => state.auth)
-
   const { category } = useParams()
+  const [showPromotions, setShowPromotions] = useState(false)
 
   useEffect(() => {
     if (category) {
-      // category comes URL-encoded, decode before dispatch
       dispatch(fetchProductsByCategory(decodeURIComponent(category)))
+      setShowPromotions(false)
+    } else if (showPromotions) {
+      dispatch(fetchPromotionProducts())
     } else {
       dispatch(fetchPublicProducts())
     }
-  }, [dispatch, category])
+  }, [dispatch, category, showPromotions])
+
+  const handleShowPromotions = () => {
+    setShowPromotions(true)
+  }
+
+  const handleShowAll = () => {
+    setShowPromotions(false)
+  }
 
   return (
     <div className="min-h-screen">
@@ -58,14 +68,17 @@ const Home = () => {
             </button>
             <button 
               onClick={() => {
-                const productSection = document.getElementById('productos-section')
-                if (productSection) {
-                  productSection.scrollIntoView({ behavior: 'smooth' })
-                }
+                handleShowPromotions()
+                setTimeout(() => {
+                  const productSection = document.getElementById('productos-section')
+                  if (productSection) {
+                    productSection.scrollIntoView({ behavior: 'smooth' })
+                  }
+                }, 100)
               }}
-              className="bg-blue-600 text-white px-8 py-4 rounded-full text-xl font-bold hover:bg-blue-700 transform hover:scale-105 transition shadow-2xl border-2 border-white"
+              className="bg-gradient-to-r from-red-500 to-pink-500 text-white px-8 py-4 rounded-full text-xl font-bold hover:from-red-600 hover:to-pink-600 transform hover:scale-105 transition shadow-2xl border-2 border-white animate-pulse"
             >
-              Ofertas Especiales
+              🎉 Ofertas Especiales
             </button>
           </div>
         </div>
@@ -94,24 +107,83 @@ const Home = () => {
         {/* Products Grid */}
         {!loading && !error && (
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-            <div className="md:col-span-1">
-              <CategorySidebar />
-            </div>
-            <div className="md:col-span-3">
+            {/* Sidebar solo si NO estamos en modo promociones */}
+            {!showPromotions && (
+              <div className="md:col-span-1">
+                <CategorySidebar />
+              </div>
+            )}
+            
+            <div className={showPromotions ? 'md:col-span-4' : 'md:col-span-3'}>
+              {/* Botones de filtro */}
+              {!category && (
+                <div className="flex gap-4 mb-8 justify-center">
+                  <button
+                    onClick={handleShowAll}
+                    className={`px-6 py-3 rounded-full font-semibold transition ${
+                      !showPromotions
+                        ? 'bg-blue-600 text-white shadow-lg'
+                        : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                    }`}
+                  >
+                    Todos los Productos
+                  </button>
+                  <button
+                    onClick={handleShowPromotions}
+                    className={`px-6 py-3 rounded-full font-semibold transition ${
+                      showPromotions
+                        ? 'bg-gradient-to-r from-red-500 to-pink-500 text-white shadow-lg'
+                        : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                    }`}
+                  >
+                    🎉 Solo Promociones
+                  </button>
+                </div>
+              )}
+
               {products.length === 0 ? (
                 <div className="text-center py-24 bg-gradient-to-br from-white to-gray-50 rounded-3xl shadow-2xl border border-gray-100">
-                  <div className="text-9xl mb-8 animate-pulse">🛍️</div>
-                  <p className="text-4xl text-gray-700 font-bold mb-4">No hay productos disponibles</p>
-                  <p className="text-xl text-gray-500 mb-8">Vuelve pronto para ver nuestras ofertas especiales</p>
-                  <button className="bg-blue-600 text-white px-8 py-4 rounded-full text-lg font-bold hover:bg-blue-700 transform hover:scale-105 transition shadow-lg">
-                    Notificarme cuando haya productos
-                  </button>
+                  <div className="text-9xl mb-8 animate-pulse">
+                    {showPromotions ? '🎉' : '🛍️'}
+                  </div>
+                  <p className="text-4xl text-gray-700 font-bold mb-4">
+                    {showPromotions 
+                      ? 'No hay promociones activas en este momento'
+                      : 'No hay productos disponibles'
+                    }
+                  </p>
+                  <p className="text-xl text-gray-500 mb-8">
+                    {showPromotions
+                      ? 'Vuelve pronto para ver nuestras ofertas especiales'
+                      : 'Estamos trabajando para traerte los mejores productos'
+                    }
+                  </p>
+                  {showPromotions && (
+                    <button
+                      onClick={handleShowAll}
+                      className="bg-blue-600 text-white px-8 py-4 rounded-full text-lg font-bold hover:bg-blue-700 transform hover:scale-105 transition shadow-lg"
+                    >
+                      Ver Todos los Productos
+                    </button>
+                  )}
                 </div>
               ) : (
                 <>
                   <div className="text-center mb-12">
-                    <h2 className="text-4xl font-bold text-gray-800 mb-4">🌟 Nuestros Productos Destacados</h2>
-                    <p className="text-xl text-gray-600">Encuentra lo que necesitas al mejor precio</p>
+                    <h2 className="text-4xl font-bold text-gray-800 mb-4">
+                      {showPromotions 
+                        ? '🎉 Productos en Promoción'
+                        : category
+                          ? `📦 ${decodeURIComponent(category)}`
+                          : '🌟 Nuestros Productos Destacados'
+                      }
+                    </h2>
+                    <p className="text-xl text-gray-600">
+                      {showPromotions 
+                        ? `${products.length} productos con descuentos especiales`
+                        : 'Encuentra lo que necesitas al mejor precio'
+                      }
+                    </p>
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
@@ -139,7 +211,7 @@ const Home = () => {
         )}
       </div>
 
-      {/* Features Section - IMPORTANTE: Esta sección debe estar FUERA del container de productos */}
+      {/* Features Section */}
       <div style={{ 
         background: 'linear-gradient(135deg, #EBF4FF 0%, #F3E7FF 50%, #FFE7F3 100%)',
         padding: '80px 0',

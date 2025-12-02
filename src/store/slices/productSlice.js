@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 import { productsAPI } from '../../services/api'
 
-// Thunks
+// Thunks existentes
 export const fetchPublicProducts = createAsyncThunk(
   'products/fetchPublic',
   async (_, { rejectWithValue }) => {
@@ -10,6 +10,18 @@ export const fetchPublicProducts = createAsyncThunk(
       return response.data.data
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || 'Error al obtener productos')
+    }
+  }
+)
+
+export const fetchPromotionProducts = createAsyncThunk(
+  'products/fetchPromotions',
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await productsAPI.getPromotions()
+      return response.data.data
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || 'Error al obtener productos en promoción')
     }
   }
 )
@@ -98,6 +110,18 @@ export const deleteProductPermanent = createAsyncThunk(
   }
 )
 
+export const togglePromotion = createAsyncThunk(
+  'products/togglePromotion',
+  async (id, { rejectWithValue }) => {
+    try {
+      const response = await productsAPI.togglePromotion(id)
+      return response.data.data
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || 'Error al cambiar estado de promoción')
+    }
+  }
+)
+
 // Slice
 const productSlice = createSlice({
   name: 'products',
@@ -126,6 +150,19 @@ const productSlice = createSlice({
         state.items = action.payload
       })
       .addCase(fetchPublicProducts.rejected, (state, action) => {
+        state.loading = false
+        state.error = action.payload
+      })
+      // Fetch Promotions
+      .addCase(fetchPromotionProducts.pending, (state) => {
+        state.loading = true
+        state.error = null
+      })
+      .addCase(fetchPromotionProducts.fulfilled, (state, action) => {
+        state.loading = false
+        state.items = action.payload
+      })
+      .addCase(fetchPromotionProducts.rejected, (state, action) => {
         state.loading = false
         state.error = action.payload
       })
@@ -196,6 +233,13 @@ const productSlice = createSlice({
       .addCase(updateProduct.rejected, (state, action) => {
         state.loading = false
         state.error = action.payload
+      })
+      // Toggle Promotion
+      .addCase(togglePromotion.fulfilled, (state, action) => {
+        const index = state.items.findIndex(item => item._id === action.payload._id)
+        if (index !== -1) {
+          state.items[index] = action.payload
+        }
       })
       // Delete
       .addCase(deleteProduct.fulfilled, (state, action) => {

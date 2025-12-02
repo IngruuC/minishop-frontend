@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 
 const ProductForm = ({ product, onSubmit, onCancel }) => {
-  const { register, handleSubmit, reset, formState: { errors } } = useForm({
+  const { register, handleSubmit, reset, watch, formState: { errors } } = useForm({
     defaultValues: product || {
       nombre: '',
       descripcion: '',
@@ -10,22 +10,50 @@ const ProductForm = ({ product, onSubmit, onCancel }) => {
       imagen: '',
       stock: '',
       categoria: '',
-      activo: true
+      activo: true,
+      promocion: {
+        activa: false,
+        tipo: 'porcentaje',
+        valor: 0,
+        fechaInicio: '',
+        fechaFin: ''
+      }
     }
   })
 
+  const promocionActiva = watch('promocion.activa')
+  const tipoPromocion = watch('promocion.tipo')
+
   useEffect(() => {
     if (product) {
-      reset(product)
+      const formattedProduct = {
+        ...product,
+        promocion: {
+          activa: product.promocion?.activa || false,
+          tipo: product.promocion?.tipo || 'porcentaje',
+          valor: product.promocion?.valor || 0,
+          fechaInicio: product.promocion?.fechaInicio ? new Date(product.promocion.fechaInicio).toISOString().slice(0, 16) : '',
+          fechaFin: product.promocion?.fechaFin ? new Date(product.promocion.fechaFin).toISOString().slice(0, 16) : ''
+        }
+      }
+      reset(formattedProduct)
     }
   }, [product, reset])
 
   const handleFormSubmit = (data) => {
-    onSubmit({
+    const formattedData = {
       ...data,
       precio: parseFloat(data.precio),
-      stock: parseInt(data.stock)
-    })
+      stock: parseInt(data.stock),
+      promocion: {
+        activa: Boolean(data.promocion.activa),
+        tipo: data.promocion.tipo,
+        valor: parseFloat(data.promocion.valor) || 0,
+        fechaInicio: data.promocion.fechaInicio || null,
+        fechaFin: data.promocion.fechaFin || null
+      }
+    }
+    onSubmit(formattedData)
   }
 
   return (
@@ -150,6 +178,91 @@ const ProductForm = ({ product, onSubmit, onCancel }) => {
           <label className="ml-2 text-sm font-medium text-gray-700">
             Producto activo (visible en la tienda)
           </label>
+        </div>
+
+        {/* === SECCIÓN DE PROMOCIÓN === */}
+        <div className="md:col-span-2 border-t pt-6 mt-4">
+          <h4 className="text-lg font-bold text-gray-800 mb-4 flex items-center">
+            🎉 Promoción
+          </h4>
+          
+          {/* Activar promoción */}
+          <div className="mb-4 flex items-center">
+            <input
+              type="checkbox"
+              {...register('promocion.activa')}
+              className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+            />
+            <label className="ml-2 text-sm font-medium text-gray-700">
+              Activar promoción para este producto
+            </label>
+          </div>
+
+          {promocionActiva && (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-blue-50 p-4 rounded-lg">
+              {/* Tipo de descuento */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Tipo de Descuento
+                </label>
+                <select
+                  {...register('promocion.tipo')}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                >
+                  <option value="porcentaje">Porcentaje (%)</option>
+                  <option value="monto_fijo">Monto Fijo ($)</option>
+                </select>
+              </div>
+
+              {/* Valor del descuento */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Valor del Descuento {tipoPromocion === 'porcentaje' ? '(%)' : '($)'}
+                </label>
+                <input
+                  type="number"
+                  step="0.01"
+                  {...register('promocion.valor', {
+                    min: { value: 0, message: 'El valor no puede ser negativo' },
+                    ...(tipoPromocion === 'porcentaje' && {
+                      max: { value: 100, message: 'El porcentaje no puede superar 100%' }
+                    })
+                  })}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  placeholder={tipoPromocion === 'porcentaje' ? '20' : '500'}
+                />
+                {errors.promocion?.valor && (
+                  <p className="text-red-500 text-sm mt-1">{errors.promocion.valor.message}</p>
+                )}
+              </div>
+
+              {/* Fecha de inicio */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Fecha de Inicio
+                </label>
+                <input
+                  type="datetime-local"
+                  {...register('promocion.fechaInicio')}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+                <p className="text-xs text-gray-500 mt-1">Dejar vacío para inicio inmediato</p>
+              </div>
+
+              {/* Fecha de fin */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Fecha de Fin
+                </label>
+                <input
+                  type="datetime-local"
+                  {...register('promocion.fechaFin')}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+                <p className="text-xs text-gray-500 mt-1">Dejar vacío para promoción indefinida</p>
+              </div>
+            </div>
+          )}
         </div>
       </div>
 
