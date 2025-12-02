@@ -36,8 +36,9 @@ const Login = () => {
   const handleOAuth = (provider) => {
     let base = import.meta.env.VITE_API_URL || 'http://localhost:5000'
     base = String(base).replace(/\/+$/, '')
-    const hasApi = /\/api$/i.test(base)
-    const url = hasApi ? `${base}/auth/${provider}` : `${base}/api/auth/${provider}`
+      const url = base.endsWith('/api')
+        ? `${base}/auth/${provider}`
+        : `${base}/api/auth/${provider}`
     window.location.href = url
   }
 
