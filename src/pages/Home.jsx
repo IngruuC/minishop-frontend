@@ -1,17 +1,25 @@
 import { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { Link } from 'react-router-dom'
-import { fetchPublicProducts } from '../store/slices/productSlice'
+import { Link, useParams } from 'react-router-dom'
+import { fetchPublicProducts, fetchProductsByCategory } from '../store/slices/productSlice'
 import ProductCard from '../components/ProductCard'
+import CategorySidebar from '../components/CategorySidebar'
 
 const Home = () => {
   const dispatch = useDispatch()
   const { items: products, loading, error } = useSelector((state) => state.products)
   const { isAuthenticated } = useSelector((state) => state.auth)
 
+  const { category } = useParams()
+
   useEffect(() => {
-    dispatch(fetchPublicProducts())
-  }, [dispatch])
+    if (category) {
+      // category comes URL-encoded, decode before dispatch
+      dispatch(fetchProductsByCategory(decodeURIComponent(category)))
+    } else {
+      dispatch(fetchPublicProducts())
+    }
+  }, [dispatch, category])
 
   return (
     <div className="min-h-screen">
@@ -85,54 +93,49 @@ const Home = () => {
 
         {/* Products Grid */}
         {!loading && !error && (
-          <>
-            {products.length === 0 ? (
-              <div className="text-center py-24 bg-gradient-to-br from-white to-gray-50 rounded-3xl shadow-2xl border border-gray-100">
-                <div className="text-9xl mb-8 animate-pulse">🛍️</div>
-                <p className="text-4xl text-gray-700 font-bold mb-4">No hay productos disponibles</p>
-                <p className="text-xl text-gray-500 mb-8">Vuelve pronto para ver nuestras ofertas especiales</p>
-                <button className="bg-blue-600 text-white px-8 py-4 rounded-full text-lg font-bold hover:bg-blue-700 transform hover:scale-105 transition shadow-lg">
-                  Notificarme cuando haya productos
-                </button>
-              </div>
-            ) : (
-              <>
-                <div className="text-center mb-12">
-                  <h2 className="text-4xl font-bold text-gray-800 mb-4">
-                    🌟 Nuestros Productos Destacados
-                  </h2>
-                  <p className="text-xl text-gray-600">
-                    Encuentra lo que necesitas al mejor precio
-                  </p>
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+            <div className="md:col-span-1">
+              <CategorySidebar />
+            </div>
+            <div className="md:col-span-3">
+              {products.length === 0 ? (
+                <div className="text-center py-24 bg-gradient-to-br from-white to-gray-50 rounded-3xl shadow-2xl border border-gray-100">
+                  <div className="text-9xl mb-8 animate-pulse">🛍️</div>
+                  <p className="text-4xl text-gray-700 font-bold mb-4">No hay productos disponibles</p>
+                  <p className="text-xl text-gray-500 mb-8">Vuelve pronto para ver nuestras ofertas especiales</p>
+                  <button className="bg-blue-600 text-white px-8 py-4 rounded-full text-lg font-bold hover:bg-blue-700 transform hover:scale-105 transition shadow-lg">
+                    Notificarme cuando haya productos
+                  </button>
                 </div>
-                
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-                  {products.map((product) => (
-                    <div key={product._id} className="product-card">
-                      <ProductCard product={product} />
-                    </div>
-                  ))}
-                </div>
-
-                {/* Call to Action - Solo si NO está autenticado */}
-                {!isAuthenticated && (
-                  <div className="mt-16 bg-gradient-to-r from-blue-600 to-purple-600 rounded-3xl p-12 text-center shadow-2xl">
-                    <h3 className="text-4xl font-bold text-white mb-4">
-                      ¿Buscás algo en especial?
-                    </h3>
-                    <p className="text-xl text-white mb-8 opacity-90">
-                      Registrate y accedé a ofertas exclusivas
-                    </p>
-                    <Link to="/register">
-                      <button className="bg-white text-blue-600 px-10 py-4 rounded-full text-xl font-bold hover:bg-blue-50 transform hover:scale-105 transition shadow-xl">
-                        Registrarse Ahora
-                      </button>
-                    </Link>
+              ) : (
+                <>
+                  <div className="text-center mb-12">
+                    <h2 className="text-4xl font-bold text-gray-800 mb-4">🌟 Nuestros Productos Destacados</h2>
+                    <p className="text-xl text-gray-600">Encuentra lo que necesitas al mejor precio</p>
                   </div>
-                )}
-              </>
-            )}
-          </>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+                    {products.map((product) => (
+                      <div key={product._id} className="product-card">
+                        <ProductCard product={product} />
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Call to Action - Solo si NO está autenticado */}
+                  {!isAuthenticated && (
+                    <div className="mt-16 bg-gradient-to-r from-blue-600 to-purple-600 rounded-3xl p-12 text-center shadow-2xl">
+                      <h3 className="text-4xl font-bold text-white mb-4">¿Buscás algo en especial?</h3>
+                      <p className="text-xl text-white mb-8 opacity-90">Registrate y accedé a ofertas exclusivas</p>
+                      <Link to="/register">
+                        <button className="bg-white text-blue-600 px-10 py-4 rounded-full text-xl font-bold hover:bg-blue-50 transform hover:scale-105 transition shadow-xl">Registrarse Ahora</button>
+                      </Link>
+                    </div>
+                  )}
+                </>
+              )}
+            </div>
+          </div>
         )}
       </div>
 

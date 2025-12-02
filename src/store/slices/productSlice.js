@@ -26,6 +26,30 @@ export const fetchAllProducts = createAsyncThunk(
   }
 )
 
+export const fetchCategories = createAsyncThunk(
+  'products/fetchCategories',
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await productsAPI.getCategories()
+      return response.data.data
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || 'Error al obtener categorías')
+    }
+  }
+)
+
+export const fetchProductsByCategory = createAsyncThunk(
+  'products/fetchByCategory',
+  async (category, { rejectWithValue }) => {
+    try {
+      const response = await productsAPI.getByCategory(category)
+      return response.data.data
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || 'Error al obtener productos por categoría')
+    }
+  }
+)
+
 export const createProduct = createAsyncThunk(
   'products/create',
   async (productData, { rejectWithValue }) => {
@@ -80,7 +104,10 @@ const productSlice = createSlice({
   initialState: {
     items: [],
     loading: false,
-    error: null
+    error: null,
+    categories: [],
+    categoriesLoading: false,
+    categoriesError: null
   },
   reducers: {
     clearError: (state) => {
@@ -102,6 +129,19 @@ const productSlice = createSlice({
         state.loading = false
         state.error = action.payload
       })
+      // Fetch Categories
+      .addCase(fetchCategories.pending, (state) => {
+        state.categoriesLoading = true
+        state.categoriesError = null
+      })
+      .addCase(fetchCategories.fulfilled, (state, action) => {
+        state.categoriesLoading = false
+        state.categories = action.payload
+      })
+      .addCase(fetchCategories.rejected, (state, action) => {
+        state.categoriesLoading = false
+        state.categoriesError = action.payload
+      })
       // Fetch All
       .addCase(fetchAllProducts.pending, (state) => {
         state.loading = true
@@ -112,6 +152,19 @@ const productSlice = createSlice({
         state.items = action.payload
       })
       .addCase(fetchAllProducts.rejected, (state, action) => {
+        state.loading = false
+        state.error = action.payload
+      })
+      // Fetch Products By Category
+      .addCase(fetchProductsByCategory.pending, (state) => {
+        state.loading = true
+        state.error = null
+      })
+      .addCase(fetchProductsByCategory.fulfilled, (state, action) => {
+        state.loading = false
+        state.items = action.payload
+      })
+      .addCase(fetchProductsByCategory.rejected, (state, action) => {
         state.loading = false
         state.error = action.payload
       })

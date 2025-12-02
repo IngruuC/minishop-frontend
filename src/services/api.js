@@ -47,6 +47,8 @@ export const authAPI = {
 // PRODUCTS
 export const productsAPI = {
   getPublic: () => api.get('/products/public'),
+  getCategories: () => api.get('/products/public/categories'),
+  getByCategory: (category) => api.get(`/products/public/category/${encodeURIComponent(category)}`),
   getAll: () => api.get('/products'),
   getById: (id) => api.get(`/products/${id}`),
   create: (data) => api.post('/products', data),
