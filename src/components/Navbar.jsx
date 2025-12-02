@@ -1,4 +1,4 @@
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { useSelector, useDispatch } from 'react-redux'
 import { logout } from '../store/slices/authSlice'
 import { useToast } from '../contexts/ToastContext'
@@ -7,6 +7,7 @@ const Navbar = () => {
   const { isAuthenticated, user } = useSelector((state) => state.auth)
   const dispatch = useDispatch()
   const navigate = useNavigate()
+  const location = useLocation()
   const { showToast } = useToast()
 
   const handleLogout = () => {
@@ -28,9 +29,12 @@ const Navbar = () => {
           </Link>
 
           <div className="flex items-center gap-6">
-            <Link to="/" className="hover:text-blue-200 transition">
-              Inicio
-            </Link>
+            {/* Mostrar "Inicio" solo si NO estamos en la página de inicio */}
+            {location.pathname !== '/' && (
+              <Link to="/" className="hover:text-blue-200 transition">
+                Inicio
+              </Link>
+            )}
 
             {isAuthenticated ? (
               <>
