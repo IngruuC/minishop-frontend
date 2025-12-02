@@ -9,6 +9,12 @@ const Navbar = () => {
 
   const handleLogout = () => {
     dispatch(logout())
+    // Mostrar confirmación al usuario y redirigir al inicio público
+    try {
+      alert('Ha cerrado sesión correctamente')
+    } catch (e) {
+      // en caso de entorno que no soporte alert, no hacer nada
+    }
     navigate('/')
   }
 
@@ -32,6 +38,9 @@ const Navbar = () => {
                 </Link>
                 <div className="flex items-center gap-4">
                   <span className="text-sm">👤 {user?.nombre}</span>
+                  <Link to="/profile" className="hover:text-blue-200 transition">
+                    Ver mi perfil
+                  </Link>
                   <button
                     onClick={handleLogout}
                     className="bg-red-500 hover:bg-red-600 px-4 py-2 rounded-lg transition"
