@@ -2,12 +2,18 @@ import { useState, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate, Link } from 'react-router-dom'
 import { login, clearError } from '../store/slices/authSlice'
+import { authAPI, API_URL } from '../services/api'
+import { useToast } from '../contexts/ToastContext'
 
 const Login = () => {
   const [formData, setFormData] = useState({ email: '', password: '' })
   const dispatch = useDispatch()
   const navigate = useNavigate()
   const { loading, error, isAuthenticated } = useSelector((state) => state.auth)
+  const { showToast } = useToast()
+  const [forgotOpen, setForgotOpen] = useState(false)
+  const [forgotEmail, setForgotEmail] = useState('')
+  const [forgotLoading, setForgotLoading] = useState(false)
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -100,9 +106,9 @@ const Login = () => {
                 <input type="checkbox" className="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500" />
                 <span className="ml-2 text-sm text-gray-600">Recordarme</span>
               </label>
-              <a href="#" className="text-sm text-blue-600 hover:text-blue-700 font-semibold">
+              <button type="button" onClick={() => setForgotOpen(true)} className="text-sm text-blue-600 hover:text-blue-700 font-semibold">
                 ¿Olvidaste tu contraseña?
-              </a>
+              </button>
             </div>
 
             <button
@@ -142,7 +148,7 @@ const Login = () => {
 
           {/* Social Login */}
           <div className="mt-6 grid grid-cols-2 gap-4">
-            <button className="flex items-center justify-center px-4 py-3 border-2 border-gray-200 rounded-xl hover:bg-gray-50 transition font-semibold text-gray-700">
+            <button type="button" onClick={() => { window.location.href = `${API_URL}/auth/google` }} className="flex items-center justify-center px-4 py-3 border-2 border-gray-200 rounded-xl hover:bg-gray-50 transition font-semibold text-gray-700">
               <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24">
                 <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
                 <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
@@ -151,7 +157,7 @@ const Login = () => {
               </svg>
               Google
             </button>
-            <button className="flex items-center justify-center px-4 py-3 border-2 border-gray-200 rounded-xl hover:bg-gray-50 transition font-semibold text-gray-700">
+            <button type="button" onClick={() => { window.location.href = `${API_URL}/auth/facebook` }} className="flex items-center justify-center px-4 py-3 border-2 border-gray-200 rounded-xl hover:bg-gray-50 transition font-semibold text-gray-700">
               <svg className="w-5 h-5 mr-2" fill="#1877F2" viewBox="0 0 24 24">
                 <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
               </svg>
@@ -160,6 +166,49 @@ const Login = () => {
           </div>
         </div>
       </div>
+
+      {/* Forgot password modal */}
+      {forgotOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div className="absolute inset-0 bg-black/40" onClick={() => setForgotOpen(false)}></div>
+          <div className="bg-white rounded-xl shadow-xl p-6 z-10 w-full max-w-md">
+            <h3 className="text-xl font-bold mb-3">Recuperar contraseña</h3>
+            <p className="text-sm text-gray-600 mb-4">Ingresá tu email y te enviaremos un enlace para resetear tu contraseña.</p>
+            <input
+              type="email"
+              value={forgotEmail}
+              onChange={(e) => setForgotEmail(e.target.value)}
+              placeholder="tu@email.com"
+              className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl mb-4"
+            />
+            <div className="flex justify-end gap-3">
+              <button onClick={() => setForgotOpen(false)} className="px-4 py-2 rounded-lg bg-gray-100">Cancelar</button>
+              <button
+                onClick={async () => {
+                  if (!forgotEmail) { showToast('Ingresá un email válido', 'info'); return }
+                  try {
+                    setForgotLoading(true)
+                    await authAPI.forgotPassword({ email: forgotEmail })
+                    showToast('Si existe una cuenta, recibirás un email con instrucciones', 'success')
+                    setForgotOpen(false)
+                    setForgotEmail('')
+                  } catch (err) {
+                    const msg = err?.response?.data?.message || 'Error al solicitar recuperación'
+                    showToast(msg, 'info')
+                  } finally {
+                    setForgotLoading(false)
+                  }
+                }}
+                className="px-4 py-2 rounded-lg bg-blue-600 text-white font-semibold"
+                disabled={forgotLoading}
+              >
+                {forgotLoading ? 'Enviando...' : 'Enviar enlace'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   )
 }
