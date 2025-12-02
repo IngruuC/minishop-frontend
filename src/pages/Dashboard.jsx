@@ -4,7 +4,8 @@ import {
   fetchAllProducts,
   createProduct,
   updateProduct,
-  deleteProduct
+  deleteProduct,
+  deleteProductPermanent
 } from '../store/slices/productSlice'
 import ProductList from '../components/ProductList'
 import ProductForm from '../components/ProductForm'
@@ -39,9 +40,10 @@ const Dashboard = () => {
     setShowDeleteModal(true)
   }
 
-  const confirmDelete = () => {
+  const confirmDelete = (isPermanent = false) => {
     if (productToDelete) {
-      dispatch(deleteProduct(productToDelete._id)).then(() => {
+      const thunk = isPermanent ? deleteProductPermanent : deleteProduct
+      dispatch(thunk(productToDelete._id)).then(() => {
         setShowDeleteModal(false)
         setProductToDelete(null)
         dispatch(fetchAllProducts())
@@ -130,6 +132,7 @@ const Dashboard = () => {
         isOpen={showDeleteModal}
         onClose={() => setShowDeleteModal(false)}
         onConfirm={confirmDelete}
+        showPermanentOption={true}
         title="¿Eliminar producto?"
         message={`¿Estás seguro que deseas eliminar "${productToDelete?.nombre}"? Esta acción no se puede deshacer.`}
       />
